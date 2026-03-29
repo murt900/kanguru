@@ -3,213 +3,147 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kanguru Matematik Parça Çözücü</title>
+  <title>Kanguru Parça Çözücü</title>
   <style>
-    :root {
-      --cell: 64px;
+    :root{
+      --cell: 62px;
       --gap: 2px;
       --bg: #f6f7fb;
       --panel: #ffffff;
       --line: #111;
-      --muted: #666;
+      --muted: #667085;
       --accent: #1f6feb;
+      --soft: #eef4ff;
+      --soft2: #fff8e7;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: #111;
-      padding: 24px;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      padding:24px;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:#111;
     }
-    h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
+    h1{margin:0 0 8px;font-size:28px}
+    h2{margin:0 0 10px;font-size:22px}
+    h3{margin:0 0 8px;font-size:18px}
+    p{margin:0 0 12px;line-height:1.55}
+    .tabs{
+      display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 18px;
     }
-    p {
-      margin: 0 0 12px;
-      line-height: 1.45;
+    .tab-btn{
+      border:none; border-radius:999px; padding:10px 14px;
+      background:#e5e7eb; font-weight:700; cursor:pointer;
     }
-    .wrap {
-      display: grid;
-      grid-template-columns: 420px minmax(320px, 1fr);
-      gap: 24px;
-      align-items: start;
+    .tab-btn.active{background:var(--accent); color:#fff}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+    .wrap{
+      display:grid; grid-template-columns:420px minmax(320px,1fr); gap:24px; align-items:start;
     }
-    .panel {
-      background: var(--panel);
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    .panel{
+      background:var(--panel);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
     }
-    .board {
-      width: calc(var(--cell) * 6 + var(--gap) * 5 + 8px);
-      display: grid;
-      grid-template-columns: repeat(6, var(--cell));
-      grid-template-rows: repeat(6, var(--cell));
-      gap: var(--gap);
-      background: var(--line);
-      padding: 4px;
-      border-radius: 12px;
-      margin: 8px 0 16px;
+    .board{
+      width:calc(var(--cell)*6 + var(--gap)*5 + 8px);
+      display:grid;
+      grid-template-columns:repeat(6, var(--cell));
+      grid-template-rows:repeat(6, var(--cell));
+      gap:var(--gap);
+      background:var(--line);
+      padding:4px;
+      border-radius:12px;
+      margin:8px 0 16px;
     }
-    .cell {
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: 700;
-      border-radius: 4px;
-      user-select: none;
-      transition: transform .2s ease, background .2s ease, opacity .2s ease;
+    .cell{
+      background:white;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:4px;
+      font-size:24px;
+      font-weight:700;
+      user-select:none;
+      transition:transform .22s ease, background .22s ease, color .22s ease;
     }
-    .cell.blankTarget {
-      background: #fff7cc;
-      color: #000;
-      outline: 4px solid #ffcc00;
-      z-index: 2;
+    .cell.blankTarget{
+      background:#fff7cc !important;
+      outline:4px solid #ffcc00;
+      z-index:2;
     }
-    .cell.unused {
-      background: #f1f1f1;
-      color: #999;
+    .controls{
+      display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;
     }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 12px;
+    input[type="number"]{
+      width:120px; padding:10px 12px; font-size:16px;
+      border-radius:10px; border:1px solid #ccc;
     }
-    input[type="number"] {
-      width: 120px;
-      padding: 10px 12px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
+    button.action{
+      padding:10px 14px; border:none; border-radius:10px;
+      background:var(--accent); color:#fff; font-size:15px; font-weight:700; cursor:pointer;
     }
-    button {
-      padding: 10px 14px;
-      font-size: 15px;
-      font-weight: 700;
-      border: none;
-      border-radius: 10px;
-      background: var(--accent);
-      color: white;
-      cursor: pointer;
+    button.secondary{background:#444}
+    button:disabled{opacity:.5; cursor:not-allowed}
+    .status, .explain{
+      border-radius:12px; padding:12px; white-space:pre-line; line-height:1.6;
     }
-    button.secondary { background: #444; }
-    button:disabled { opacity: .45; cursor: not-allowed; }
-    .status {
-      min-height: 60px;
-      padding: 12px;
-      border-radius: 12px;
-      background: #f3f5f9;
-      font-size: 15px;
-      line-height: 1.5;
-      margin-bottom: 12px;
-      white-space: pre-line;
+    .status{background:var(--soft); min-height:64px; margin-bottom:12px}
+    .explain{background:var(--soft2); min-height:180px}
+    .legend{
+      display:grid; grid-template-columns:repeat(2,minmax(140px,1fr));
+      gap:8px; margin-top:12px;
     }
-    .legend {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(140px, 1fr));
-      gap: 8px;
-      margin-top: 10px;
+    .legend div{
+      display:flex; align-items:center; gap:8px; font-size:14px;
     }
-    .legend div {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
+    .dot{
+      width:18px; height:18px; border-radius:4px; border:2px solid #111;
     }
-    .dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      border: 2px solid #111;
+    .results{
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(55px,1fr)); gap:8px; margin-top:12px;
     }
-    .results {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
-      gap: 8px;
-      margin-top: 12px;
+    .resultItem{
+      padding:10px 0; text-align:center; border-radius:10px; font-weight:700;
+      background:#eef2f7; border:1px solid #d8dfe8; cursor:pointer; user-select:none;
     }
-    .resultItem {
-      padding: 10px 0;
-      text-align: center;
-      border-radius: 10px;
-      font-weight: 700;
-      background: #eef2f7;
-      border: 1px solid #d8dfe8;
+    .ok{background:#dff5df; border-color:#90c490}
+    .no{background:#f8dddd; border-color:#d29595}
+    .small{color:var(--muted); font-size:13px; margin-top:10px; line-height:1.6}
+    .flow-step, .box{
+      background:#fff;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:12px 14px;
+      line-height:1.6;
+      margin-bottom:10px;
     }
-    .ok { background: #dff5df; border-color: #90c490; }
-    .no { background: #f8dddd; border-color: #d29595; }
-    .small {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 10px;
+    .formula{
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      padding:12px 14px;
+      font-family:"Courier New", monospace;
+      overflow:auto;
+      line-height:1.6;
+      margin:10px 0;
+      white-space:pre-wrap;
     }
-    code.inline {
-      background: #f1f1f1;
-      padding: 2px 6px;
-      border-radius: 6px;
+    pre.codebox{
+      background:#f6f6f6; padding:12px; border-radius:12px; overflow:auto; font-size:13px; line-height:1.4;
+      white-space:pre-wrap;
     }
-    @media (max-width: 980px) {
-      .wrap { grid-template-columns: 1fr; }
-      .board { margin-inline: auto; }
+    @media (max-width:980px){
+      .wrap{grid-template-columns:1fr}
+      .board{margin-inline:auto}
     }
-  
-    .tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 0 0 18px;
-    }
-    .tab-btn {
-      padding: 10px 14px;
-      border: none;
-      border-radius: 999px;
-      background: #e5e7eb;
-      color: #111;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .tab-btn.active {
-      background: var(--accent);
-      color: white;
-    }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-    .info-box {
-      background: #f8fafc;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 14px;
-      line-height: 1.6;
-      margin-top: 12px;
-    }
-    .flow-step {
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      line-height: 1.6;
-    }
-    .formula {
-      background: #eef4ff;
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-family: "Courier New", monospace;
-      margin: 8px 0;
-      overflow: auto;
-    }
-
   </style>
 </head>
 <body>
-  <h1>Kanguru Matematik Parça Çözücü</h1>
-  <p>Çalışan çözücü korunmuştur. Sadece üstüne sekme, akış mantığı ve matematiksel açıklama eklenmiştir.</p>
+  <h1>Kanguru Parça Çözücü</h1>
+  <p>Bu sürüm baştan yazıldı. 6x6 tahtadaki <strong>kanguru yazan köşe kare 36. kare</strong> kabul edildi. Yani sistem artık 1-36 arasında çalışır.</p>
 
   <div class="tabs">
     <button class="tab-btn active" data-tab="solverTab">Çözücü</button>
@@ -218,109 +152,118 @@
   </div>
 
   <section id="solverTab" class="tab-panel active">
+    <div class="wrap">
+      <div class="panel">
+        <div id="board" class="board"></div>
 
-  <h1>Kanguru Matematik Parça Çözücü</h1>
-  <p>Bu sayfa seçtiğin numaralı kareyi boş bırakıp kalan alanı parçalarla doldurmayı dener. Çözüm bulursa yerleştirmeyi adım adım animasyonlu gösterir.</p>
+        <div class="controls">
+          <input id="targetInput" type="number" min="1" max="36" value="36" />
+          <button id="solveBtn" class="action">Seçili sayıyı çöz</button>
+          <button id="scanBtn" class="action secondary">1-36 hepsini tara</button>
+        </div>
 
-  <div class="wrap">
-    <div class="panel">
-      <div id="board" class="board"></div>
-      <div class="controls">
-        <input id="targetInput" type="number" min="1" max="35" value="1" />
-        <button id="solveBtn">Seçili sayıyı çöz</button>
-        <button id="scanBtn" class="secondary">1-35 hepsini tara</button>
+        <div id="status" class="status">Hazır.</div>
+        <div id="explain" class="explain">Bir sayı seç. Çözüm varsa yerleştirmeyi animasyonlu gösterir. Çözüm yoksa neden tıkandığını açıklar.</div>
+
+        <div class="legend" id="legend"></div>
+
+        <div class="small">
+          Not: Bu sürümde sadece döndürme var, ayna alma yok. 36. kare sağ alt köşedeki kanguru kare olarak kabul edildi.
+        </div>
       </div>
-      <div id="status" class="status">Hazır.</div>
-      <div class="legend" id="legend"></div>
-      <div class="small">
-        Not: Kodda sadece döndürme var, ayna alma yok. Parça tanımları üstte tek yerde tutuldu. Görselde bir kare eksik/fazla ise <code class="inline">PIECES</code> kısmını düzeltmen yeter.
-      </div>
-    </div>
 
-    <div class="panel">
-      <h3 style="margin-top:0">Tarama sonuçları</h3>
-      <p>Hangi numaralar için çözüm bulunduğunu burada görürsün.</p>
-      <div id="results" class="results"></div>
-      <div class="small" id="summary"></div>
+      <div class="panel">
+        <h3 style="margin-top:0">Tarama Sonuçları</h3>
+        <p>Yeşiller çözümü bulunan, kırmızılar çözümü bulunamayan sayılardır. Kutulara tıklayarak doğrudan o sayıyı çözebilirsin.</p>
+        <div id="results" class="results"></div>
+        <div class="small" id="summary">Henüz tarama yapılmadı.</div>
 
-      <h3>Parça notu</h3>
-      <p>Görsellerden çıkarılan şekiller aşağıdaki gibi tanımlandı. Eğer gerçek sette fark varsa çözüm kümesi değişir:</p>
-      <pre style="background:#f6f6f6;padding:12px;border-radius:12px;overflow:auto;font-size:13px;line-height:1.4">G = [(0,0),(0,1),(1,1),(1,2),(1,3)]
+        <h3 style="margin-top:18px;">Parça Koordinatları</h3>
+        <p>Şu an kodda kullanılan parça koordinatları bunlar:</p>
+        <pre class="codebox">G = [(0,0),(0,1),(1,1),(1,2),(1,3)]
 L = [(1,0),(1,1),(1,2),(1,3),(0,3)]
 I = [(0,0),(0,1),(0,2),(0,3),(0,4)]
 Y = [(1,0),(1,1),(0,2),(1,2),(1,3)]
 P = [(1,0),(0,1),(1,1),(0,2),(1,2)]
 U = [(0,0),(2,0),(0,1),(1,1),(2,1)]
 X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
+        <div class="small">Gerçek sette kare dizilimi farklıysa çözüm listesi de değişir.</div>
+      </div>
     </div>
-  </div>
-
-  
   </section>
 
   <section id="flowTab" class="tab-panel">
     <div class="panel">
-      <h3 style="margin-top:0">Algoritma Akış Şeması Mantığı</h3>
-      <p>Bu bölüm, çalışan kodun izlediği akışı sade şekilde anlatır. Algoritma geri izleme kullanır; yani bir yerleşim tıkanırsa geri dönüp başka olasılığı dener.</p>
+      <h2>Algoritma Akış Şeması Mantığı</h2>
+      <p>Bu, kodun izlediği gerçek akıştır. Geri izleme kullanır. Yani bir dal tıkanırsa geri döner ve başka olasılığı dener.</p>
 
-      <div class="flow-step"><strong>1. Başla</strong><br>6x6 tahta oluşturulur ve 1-35 arası kareler aktif kabul edilir.</div>
-      <div class="flow-step"><strong>2. Hedef kareyi seç</strong><br>Kullanıcının seçtiği sayı boş bırakılacak kare olarak işaretlenir.</div>
-      <div class="flow-step"><strong>3. Parçaların döndürmelerini üret</strong><br>Her parça için sadece döndürülmüş haller hesaplanır. Ayna alma yoktur.</div>
-      <div class="flow-step"><strong>4. Olası konumları çıkar</strong><br>Her parçanın tahtaya sığan bütün yerleşimleri hazırlanır.</div>
-      <div class="flow-step"><strong>5. En kısıtlı kareyi seç</strong><br>Algoritma, kapatılması en zor kareyi seçer. Böylece gereksiz dallar azalır.</div>
-      <div class="flow-step"><strong>6. Uygun parçaları dene</strong><br>Seçilen kareyi kapatabilen, taşmayan ve çakışmayan yerleşimler sırayla denenir.</div>
-      <div class="flow-step"><strong>7. Yerleştir ve devam et</strong><br>Parça yerleştirilir, sonra kalan parçalar için aynı işlem tekrarlanır.</div>
-      <div class="flow-step"><strong>8. Çıkmaz varsa geri dön</strong><br>Hiçbir uygun yerleşim yoksa son hamle geri alınır ve başka seçenek denenir.</div>
-      <div class="flow-step"><strong>9. Tüm parçalar biterse çözüm</strong><br>Bütün parçalar yerleşirse çözüm kaydedilir ve animasyonla gösterilir.</div>
+      <div class="flow-step"><strong>1. Tahtayı oluştur</strong><br>6x6 tahta hazırlanır. 1-36 arası bütün kareler aktiftir.</div>
+      <div class="flow-step"><strong>2. Hedef kareyi seç</strong><br>Kullanıcının seçtiği sayı boş kalacak kare olur.</div>
+      <div class="flow-step"><strong>3. Parçaların döndürmelerini üret</strong><br>Her parça için geçerli dönüşler hesaplanır. Ayna alma yoktur.</div>
+      <div class="flow-step"><strong>4. Olası yerleşimleri hazırla</strong><br>Her parçanın tahta içine sığan tüm konumları çıkarılır.</div>
+      <div class="flow-step"><strong>5. En kısıtlı kareyi seç</strong><br>Algoritma, kapatılması en zor kareyi seçer. Bu hız kazandırır.</div>
+      <div class="flow-step"><strong>6. Uygun parçaları dene</strong><br>Seçilen kareyi kapatabilen bütün yerleşimler tek tek sınanır.</div>
+      <div class="flow-step"><strong>7. Yerleştir ve devam et</strong><br>Parça konur, sonra kalan parçalar için aynı işlem tekrar edilir.</div>
+      <div class="flow-step"><strong>8. Çıkmaz varsa geri dön</strong><br>Hiçbir yerleşim uymuyorsa son hamle geri alınır.</div>
+      <div class="flow-step"><strong>9. Tüm parçalar biterse çözüm</strong><br>Bütün parçalar kurallı biçimde yerleşirse çözüm bulunur ve animasyon gösterilir.</div>
 
-      <div class="info-box">
-        <strong>Kısa akış:</strong><br>
-        Başla → Hedef kareyi boş bırak → Parçaların döndürmelerini üret → Olası konumları dene → Çıkmaz varsa geri dön → Tüm parçalar yerleşirse çözümü göster
-      </div>
+      <div class="formula">Başla
+↓
+6x6 tahta oluştur
+↓
+Boş kalacak kareyi seç
+↓
+Parçaların döndürmelerini üret
+↓
+Tüm uygun yerleşimleri dene
+↓
+Çıkmaz varsa geri dön
+↓
+Tüm parçalar yerleşirse çözümü göster</div>
     </div>
   </section>
 
   <section id="mathTab" class="tab-panel">
     <div class="panel">
-      <h3 style="margin-top:0">Matematiksel Açıklama</h3>
-      <p>Bu kod rastgele deneme yapmaz. Aslında bir yerleştirme ve kesin kaplama problemi çözer. Amaç, seçilen kare boş kalırken geri kalan uygun kareleri verilen parçalarla çakışmadan kaplamaktır.</p>
+      <h2>Matematiksel Açıklama</h2>
+      <p>Bu kod rastgele deneme yapmaz. Aslında kesin kaplama mantığıyla çalışır.</p>
 
-      <div class="info-box">
-        <strong>Tahta modeli</strong>
-        <div class="formula">Aktif kare sayısı = 35</div>
-        Kullanıcı bir kare seçtiğinde o kare boş bırakılır.
-        <div class="formula">Kaplanması hedeflenen alan = 35 - 1 = 34 kare</div>
+      <h3>Tahta modeli</h3>
+      <div class="formula">Toplam kare = 36
+Boş bırakılacak kare = 1
+Kaplanması hedeflenen alan = 36 - 1 = 35</div>
+
+      <h3>Parça alanı</h3>
+      <p>Her parça 5 kare kaplıyorsa ve toplam 7 parça varsa:</p>
+      <div class="formula">Toplam parça alanı = 7 × 5 = 35</div>
+
+      <p>Yani 36. kareyi de dahil ettiğinde matematik artık oturur:</p>
+      <div class="formula">Kaplanması gereken alan = 35
+Parçaların toplam alanı = 35</div>
+
+      <h3>Bir yerleşimin geçerli olması için</h3>
+      <div class="box">
+        • Parça sınır dışına taşmamalı.<br>
+        • Seçilen boş kareyi kapatmamalı.<br>
+        • Başka parçayla çakışmamalı.<br>
+        • Ayna görüntüsü kullanılmamalı.
       </div>
 
-      <div class="info-box">
-        <strong>Bir yerleşimin geçerli olması için:</strong>
-        <ul>
-          <li>Parça sınır dışına taşmamalı.</li>
-          <li>Seçilen boş kareyi kapatmamalı.</li>
-          <li>Başka parçayla çakışmamalı.</li>
-          <li>Ayna görüntüsü kullanılmamalı.</li>
-        </ul>
-      </div>
+      <h3>Çıkmaz mantığı</h3>
+      <p>Bir boş kareyi kapatacak hiçbir parça kalmazsa o dal biter.</p>
+      <div class="formula">Bir boş kare için uygun yerleşim sayısı = 0  ⇒  çıkmaz</div>
 
-      <div class="info-box">
-        <strong>Çıkmaz mantığı</strong><br>
-        Arama sırasında öyle bir boş kare gelebilir ki onu kapatabilecek hiçbir geçerli yerleşim kalmaz.
-        <div class="formula">Bir boş kare için uygun yerleşim sayısı = 0  ⇒  çıkmaz</div>
-        Bu durumda algoritma geri döner ve başka olasılığı dener.
-      </div>
-
-      <div class="info-box">
-        <strong>Neden güvenilir?</strong><br>
-        Çünkü çözüm bulunursa kurallı bir yerleşim gerçekten bulunmuştur. Çözüm çıkmazsa da algoritma denediği dallarda yerleşimin tıkandığını göstermiş olur.
+      <h3>Önemli not</h3>
+      <div class="box">
+        Bu sürüm matematik olarak 36 kare üzerinden doğru kuruldu. Ama yine de gerçek oyundaki parça şekilleri bu koordinatlardan farklıysa, çıkan çözüm listesi gerçek setle birebir aynı olmayabilir.
       </div>
     </div>
   </section>
-<script>
+
+  <script>
     const W = 6;
     const H = 6;
 
-    // Görsellerden çıkarılan parça koordinatları.
-    // Sadece döndürme yapılır, mirror/reflection yapılmaz.
     const PIECES = [
       { id: 'G', color: '#A8E0A2', cells: [[0,0],[0,1],[1,1],[1,2],[1,3]] },
       { id: 'L', color: '#A9D2FF', cells: [[1,0],[1,1],[1,2],[1,3],[0,3]] },
@@ -331,21 +274,18 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
       { id: 'X', color: '#333333', cells: [[1,0],[0,1],[1,1],[2,1],[1,2]] }
     ];
 
-    const numberedCells = Array.from({ length: 35 }, (_, i) => ({ n: i + 1, x: i % 6, y: Math.floor(i / 6) }));
-    const lastCell = { n: '', x: 5, y: 5 };
-    const allBoardCells = [];
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) allBoardCells.push([x, y]);
-
+    const numberedCells = Array.from({ length: 36 }, (_, i) => ({ n: i + 1, x: i % 6, y: Math.floor(i / 6) }));
     const boardEl = document.getElementById('board');
     const statusEl = document.getElementById('status');
+    const explainEl = document.getElementById('explain');
     const targetInput = document.getElementById('targetInput');
     const solveBtn = document.getElementById('solveBtn');
     const scanBtn = document.getElementById('scanBtn');
     const resultsEl = document.getElementById('results');
     const summaryEl = document.getElementById('summary');
     const legendEl = document.getElementById('legend');
-
     const cellEls = new Map();
+
     let busy = false;
 
     function key(x, y) {
@@ -362,11 +302,7 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
           cell.className = 'cell';
           cell.dataset.x = x;
           cell.dataset.y = y;
-          if (idx <= 35) cell.textContent = idx;
-          else {
-            cell.textContent = '';
-            cell.classList.add('unused');
-          }
+          cell.textContent = idx === 36 ? '🦘' : idx;
           boardEl.appendChild(cell);
           cellEls.set(key(x, y), cell);
         }
@@ -384,8 +320,8 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
 
     function resetBoardColors() {
       for (const cell of cellEls.values()) {
-        cell.style.background = cell.classList.contains('unused') ? '#f1f1f1' : 'white';
-        cell.style.color = cell.classList.contains('unused') ? '#999' : '#111';
+        cell.style.background = 'white';
+        cell.style.color = '#111';
         cell.classList.remove('blankTarget');
         cell.style.transform = 'scale(1)';
         cell.style.opacity = '1';
@@ -394,7 +330,7 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
 
     function highlightTarget(targetNum) {
       resetBoardColors();
-      if (targetNum < 1 || targetNum > 35) return;
+      if (targetNum < 1 || targetNum > 36) return;
       const x = (targetNum - 1) % 6;
       const y = Math.floor((targetNum - 1) / 6);
       const cell = cellEls.get(key(x, y));
@@ -457,7 +393,7 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
       const emptyKey = key(empty[0], empty[1]);
 
       const uncovered = new Set();
-      allBoardCells.forEach(([x, y]) => {
+      numberedCells.forEach(({x, y}) => {
         const k = key(x, y);
         if (k !== emptyKey) uncovered.add(k);
       });
@@ -473,7 +409,6 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
       function rec(remainingPieces, uncoveredSet, solution) {
         if (remainingPieces.length === 0) return uncoveredSet.size === 0 ? solution : null;
 
-        let bestCell = null;
         let bestOptions = null;
 
         for (const c of uncoveredSet) {
@@ -500,13 +435,11 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
           if (options.length === 0) return null;
           if (!bestOptions || options.length < bestOptions.length) {
             bestOptions = options;
-            bestCell = c;
             if (options.length === 1) break;
           }
         }
 
         for (const option of bestOptions) {
-          if (!remainingPieces.includes(option.pid)) continue;
           const nextUncovered = new Set(uncoveredSet);
           for (const [x, y] of option.cells) nextUncovered.delete(key(x, y));
           const nextPieces = remainingPieces.filter(p => p !== option.pid);
@@ -542,11 +475,18 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
       }
     }
 
+    function buildExplanation(targetNum, solution) {
+      if (solution) {
+        return `${targetNum} boş bırakılarak çözüm bulundu.\n\nYerleştirme sırası: ${solution.map(s => s.pid).join(' → ')}\n\nBu, seçilen kare boş bırakıldığında parçaların çakışmadan ve kuralları bozmadan yerleşebildiği anlamına gelir.`;
+      }
+      return `${targetNum} boş bırakılarak çözüm bulunamadı.\n\nBu, algoritmanın kurallara uyan yerleşimleri denediği halde tüm parçaları aynı anda yerleştiremediği anlamına gelir.\n\nNot: 36 kare modeli artık doğru kuruldu. Eğer hâlâ beklediğinden az çözüm çıkıyorsa, sebep büyük ihtimalle parça koordinatlarının gerçek setten farklı olmasıdır.`;
+    }
+
     async function solveSingle() {
       if (busy) return;
       const targetNum = Number(targetInput.value);
-      if (!Number.isInteger(targetNum) || targetNum < 1 || targetNum > 35) {
-        statusEl.textContent = '1 ile 35 arasında sayı gir.';
+      if (!Number.isInteger(targetNum) || targetNum < 1 || targetNum > 36) {
+        statusEl.textContent = '1 ile 36 arasında sayı gir.';
         return;
       }
 
@@ -554,16 +494,20 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
       solveBtn.disabled = true;
       scanBtn.disabled = true;
       statusEl.textContent = `${targetNum} için çözüm aranıyor...`;
+      explainEl.textContent = 'Analiz hazırlanıyor...';
       highlightTarget(targetNum);
       await sleep(30);
 
       const solution = solveFor(targetNum);
+      explainEl.textContent = buildExplanation(targetNum, solution);
+
       if (!solution) {
-        statusEl.textContent = `${targetNum} boş bırakılarak çözüm bulunamadı.\nBu, parça tanımının yanlış olmasından da kaynaklanabilir.`;
+        statusEl.textContent = `${targetNum} boş bırakılarak çözüm bulunamadı.`;
       } else {
         statusEl.textContent = `${targetNum} boş bırakılarak çözüm bulundu.\nYerleştirme sırası: ${solution.map(s => s.pid).join(' → ')}`;
         await animateSolution(targetNum, solution);
       }
+
       busy = false;
       solveBtn.disabled = false;
       scanBtn.disabled = false;
@@ -578,8 +522,10 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
       summaryEl.textContent = 'Tarama yapılıyor...';
 
       let solved = 0;
-      for (let n = 1; n <= 35; n++) {
-        statusEl.textContent = `${n}/35 taranıyor...`;
+      const noList = [];
+
+      for (let n = 1; n <= 36; n++) {
+        statusEl.textContent = `${n}/36 taranıyor...`;
         const sol = solveFor(n);
         const div = document.createElement('div');
         div.className = 'resultItem ' + (sol ? 'ok' : 'no');
@@ -588,27 +534,17 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
         div.onclick = () => { targetInput.value = n; solveSingle(); };
         resultsEl.appendChild(div);
         if (sol) solved++;
+        else noList.push(n);
         await sleep(10);
       }
-      summaryEl.textContent = `${solved} sayı için çözüm bulundu, ${35 - solved} sayı için çözüm bulunamadı.`;
+
+      summaryEl.textContent = `${solved} sayı için çözüm bulundu, ${36 - solved} sayı için çözüm bulunamadı.\nÇözüm bulunamayanlar: ${noList.length ? noList.join(', ') : 'yok'}`;
       statusEl.textContent = 'Tarama bitti. Kutulara tıklayıp tek tek animasyon izleyebilirsin.';
       busy = false;
       solveBtn.disabled = false;
       scanBtn.disabled = false;
     }
 
-    drawBoard();
-    drawLegend();
-    buildPlacements();
-    highlightTarget(1);
-
-    targetInput.addEventListener('input', () => {
-      const n = Number(targetInput.value);
-      if (Number.isInteger(n)) highlightTarget(n);
-    });
-    solveBtn.addEventListener('click', solveSingle);
-    scanBtn.addEventListener('click', scanAll);
-  
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -618,7 +554,17 @@ X = [(1,0),(0,1),(1,1),(2,1),(1,2)]</pre>
       });
     });
 
-  </script>
+    drawBoard();
+    drawLegend();
+    buildPlacements();
+    highlightTarget(36);
 
+    targetInput.addEventListener('input', () => {
+      const n = Number(targetInput.value);
+      if (Number.isInteger(n)) highlightTarget(n);
+    });
+    solveBtn.addEventListener('click', solveSingle);
+    scanBtn.addEventListener('click', scanAll);
+  </script>
 </body>
 </html>
